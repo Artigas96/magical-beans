@@ -31,6 +31,10 @@ jobs:
         VERSION="${TAG#v}"
         echo "version=$VERSION" >> $GITHUB_OUTPUT
 
+    - name: Generate changelog
+      run: |
+        RELEASE_VERSION=${{ steps.get_version.outputs.version }} npm run changelog
+
     - name: Apply version to module.json
       run: npm run apply-version "${{ steps.get_version.outputs.version }}"
       env:

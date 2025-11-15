@@ -1,0 +1,13 @@
+{
+  "skip": {
+    "tag": true,
+    "commit": true
+  },
+  "types": [
+    { "type": "feat", "section": "✨ Features" },
+    { "type": "fix",  "section": "🐛 Fixes" },
+    { "type": "docs", "section": "📚 Docs" },
+    { "type": "chore","section": "🧹 Chores" },
+    { "type": "refactor","section": "♻️ Refactors" }
+  ]
+}
