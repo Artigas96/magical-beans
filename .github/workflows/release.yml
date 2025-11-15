@@ -1,0 +1,53 @@
+name: Release FoundryVTT Module
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Extract version from tag
+      id: get_version
+      run: |
+        TAG="${GITHUB_REF#refs/tags/}"
+        VERSION="${TAG#v}"
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+    - name: Apply version to module.json
+      run: npm run apply-version "${{ steps.get_version.outputs.version }}"
+      env:
+        GITHUB_REPOSITORY: ${{ github.repository }}
+
+    - name: Zip module
+      run: |
+        zip -r module.zip . \
+          -x ".git/*" \
+          -x ".github/*" \
+          -x "node_modules/*" \
+          -x "*.yml"
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ github.ref_name }}
+        name: Release ${{ github.ref_name }}
+        files: |
+          module.zip
+          module.json
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
