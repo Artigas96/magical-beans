@@ -24,9 +24,11 @@
 				"dnd5e"
 			],
 			"private": false,
-			"PLAYER": "OBSERVER",
-			"ASSISTANT": "OWNER",
-			"GAMEMASTER": "OWNER"
+			"ownership": {
+                "PLAYER": "OBSERVER",
+                "ASSISTANT": "OWNER",
+                "GAMEMASTER": "OWNER"
+            }
 		}
 	],
 	"languages": [
