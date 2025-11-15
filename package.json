@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "release": "standard-version && node ./scripts/update-module-version.js"
+  },
+  "devDependencies": {
+    "standard-version": "^9.5.0"
+  }
+}
