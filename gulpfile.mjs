@@ -1,14 +1,10 @@
-// SPDX-FileCopyrightText: 2022 Johannes Loher
-// SPDX-FileCopyrightText: 2022 David Archibald
-//
-// SPDX-License-Identifier: MIT
-
 import fs from "fs-extra";
 import gulp from "gulp";
 import prefix from "gulp-autoprefixer";
 import sass from "gulp-dart-sass";
 import sourcemaps from "gulp-sourcemaps";
 import path from "node:path";
+import { nanoid } from "nanoid";
 import buffer from "vinyl-buffer";
 import source from "vinyl-source-stream";
 import yargs from "yargs";
@@ -76,20 +72,79 @@ async function copyFiles() {
 	}
 }
 
+
+/**
+ * Build Compendium Database (.db) from source JSON files
+ */
+async function buildPacks(cb) {
+	console.log("¡Tarea buildPacks iniciada!");
+    const packName = "magic-items"; // Debe coincidir con el 'name' en module.json
+    const sourcePath = path.join(sourceDirectory, "items");
+    const targetPath = path.join(distDirectory, "packs", `${packName}.db`);
+
+    // 1. Asegurar la carpeta de destino
+    await fs.ensureDir(path.dirname(targetPath));
+
+    try {
+        // 2. Leer todos los archivos JSON de la carpeta fuente
+        const filenames = (await fs.readdir(sourcePath)).filter(name => name.endsWith('.json'));
+        let dbContent = '';
+
+        console.log(`🔎 Procesando ${filenames.length} documentos para el compendio '${packName}'...`);
+
+        // 3. Procesar cada archivo, añadir ID y formatear
+        for (const filename of filenames) {
+			const filePath = path.join(sourcePath, filename);
+			const fileContent = await fs.readFile(filePath, 'utf8');
+			
+			try {
+				const itemData = JSON.parse(fileContent);
+
+				// Asignar el ID único de Foundry VTT
+				itemData._id = nanoid(16); 
+
+				// Convertir a JSON de una sola línea y añadir al contenido de la DB
+				dbContent += JSON.stringify(itemData) + '\n';
+				console.log(`\t✅ Procesado: ${filename}`); // Muestra el éxito
+				
+			} catch (e) {
+				// ¡Si esto se imprime, tienes un JSON mal formateado!
+				console.error(`\t❌ ERROR DE PARSEO en ${filename}: ${e.message}`); 
+			}
+		}
+		
+		console.log(`Tamaño del contenido a escribir: ${dbContent.length} bytes.`);
+        // 4. Escribir el contenido final en el archivo .db
+        await fs.writeFile(targetPath, dbContent);
+
+        console.log(`\n🎉 Compendio '${packName}' generado en ${targetPath}`);
+
+    } catch (error) {
+        console.error(`\n❌ ERROR al construir el compendio '${packName}':`, error.message);
+        // Llama al callback con el error para fallar la tarea de Gulp
+        return cb(error); 
+    }
+
+    // Llama al callback si todo ha ido bien
+    cb();
+}
+
 /**
  * Watch for changes for each build step
  */
 export function watch() {
-	gulp.watch(`${sourceDirectory}/**/*.${sourceFileExtension}`, { ignoreInitial: false }, buildCode);
-	gulp.watch(`${stylesDirectory}/**/*.${stylesExtension}`, { ignoreInitial: false }, buildStyles);
-	gulp.watch(
-		staticFiles.map((file) => `${sourceDirectory}/${file}`),
-		{ ignoreInitial: false },
-		copyFiles,
-	);
+    gulp.watch(`${sourceDirectory}/**/*.${sourceFileExtension}`, { ignoreInitial: false }, buildCode);
+    gulp.watch(`${stylesDirectory}/**/*.${stylesExtension}`, { ignoreInitial: false }, buildStyles);
+    gulp.watch(
+        staticFiles.map((file) => `${sourceDirectory}/${file}`),
+        { ignoreInitial: false },
+        copyFiles,
+    );
+    // Watch para los archivos JSON del compendio
+    gulp.watch(`${sourceDirectory}/items/**/*.json`, { ignoreInitial: false }, buildPacks); // <-- Añadido el watcher para ítems
 }
 
-export const build = gulp.series(clean, gulp.parallel(buildCode, buildStyles, copyFiles));
+export const build = gulp.series(clean, gulp.parallel(buildCode, buildStyles, copyFiles, buildPacks));
 
 /** ******************/
 /*      CLEAN       */

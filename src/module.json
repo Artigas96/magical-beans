@@ -15,7 +15,20 @@
 		"verified": "12"
 	},
 	"esmodules": ["scripts/randomEffect.js"],
-	"packs": [],
+	"packs": [
+		{
+			"name": "magical-beans-items",
+			"label": "Magical Beans Items",
+			"path": "packs/magical-beans-items.db",
+			"system": [
+				"dnd5e"
+			],
+			"private": false,
+			"PLAYER": "OBSERVER",
+			"ASSISTANT": "OWNER",
+			"GAMEMASTER": "OWNER"
+		}
+	],
 	"languages": [
 		{
 			"lang": "en",
