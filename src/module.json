@@ -1,29 +1,33 @@
 {
-  "id": "magical-beans",
-  "type": "module",
-  "title": "Magical Beans",
-  "description": "Tres objetos que aplican efectos aleatorios usando un d100.",
-  "version": "1.0.6",
-  "authors": [
-    {
-      "name": "Artigas96"
-    }
-  ],
-  "compatibility": {
-    "minimum": "12",
-    "verified": "12"
-  },
-  "scripts": [
-    "scripts/randomEffect.js"
-  ],
-  "packs": [
-    {
-      "label": "Magical Beans",
-      "name": "magical-beans",
-      "path": "packs/magical-beans.db",
-      "type": "Item"
-    }
-  ],
-  "manifest": "https://raw.githubusercontent.com/Artigas96/magical-beans/main/module.json",
-  "download": "https://github.com/Artigas96/magical-beans/releases/latest/download/module.zip"
+	"id": "magical-beans",
+	"title": "Magical Beans",
+	"description": "Tres objetos que aplican efectos aleatorios usando un d100.",
+	"authors": [
+		{
+			"name": "Artigas96",
+			"discord": "artigas96"
+		}
+	],
+	"url": "This is auto replaced",
+	"version": "This is auto replaced",
+	"compatibility": {
+		"minimum": "12",
+		"verified": "12"
+	},
+	"esmodules": ["scripts/randomEffect.js"],
+	"packs": [],
+	"languages": [
+		{
+			"lang": "en",
+			"name": "English",
+			"path": "lang/en.json"
+		},
+		{
+			"lang": "es",
+			"name": "Español",
+			"path": "lang/es.json"
+		}
+	],
+	"manifest": "This is auto replaced",
+	"download": "This is auto replaced"
 }
