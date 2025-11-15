@@ -35,6 +35,13 @@ jobs:
       run: |
         RELEASE_VERSION=${{ steps.get_version.outputs.version }} npm run changelog
 
+    - name: Extract changelog section
+      id: changelog
+      run: |
+        VERSION=${{ steps.get_version.outputs.version }}
+        awk "/^## \\[?$VERSION/{flag=1;next}/^## /{flag=0}flag" CHANGELOG.md > RELEASE_CHANGELOG.md
+        echo "Changelog generado para la versión $VERSION"
+
     - name: Apply version to module.json
       run: npm run apply-version "${{ steps.get_version.outputs.version }}"
       env:
@@ -53,6 +60,7 @@ jobs:
       with:
         tag_name: ${{ github.ref_name }}
         name: Release ${{ github.ref_name }}
+        body_path: RELEASE_CHANGELOG.md
         files: |
           module.zip
           module.json
