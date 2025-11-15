@@ -1,0 +1,19 @@
+{
+  "id": "magical-beans",
+  "title": "Magical Beans",
+  "description": "Tres objetos que aplican efectos aleatorios usando un d100.",
+  "version": "1.0.0",
+  "authors": [{ "name": "Artigas96" }],
+  "compatibleCoreVersion": "11",
+  "scripts": [
+    "scripts/randomEffect.js"
+  ],
+  "packs": [
+    {
+      "label": "Magical Beans",
+      "name": "magical-beans",
+      "path": "packs/magical-beans.db",
+      "type": "Item"
+    }
+  ]
+}
