@@ -17,9 +17,9 @@
 	"esmodules": ["scripts/randomEffect.js"],
 	"packs": [
 		{
-			"name": "magical-beans-items",
+			"name": "magical-items",
 			"label": "Magical Beans Items",
-			"path": "packs/magical-beans-items.db",
+			"path": "packs/magical-items.db",
 			"system": [
 				"dnd5e"
 			],

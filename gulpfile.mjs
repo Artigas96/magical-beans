@@ -78,7 +78,7 @@ async function copyFiles() {
  */
 async function buildPacks(cb) {
 	console.log("¡Tarea buildPacks iniciada!");
-    const packName = "magic-items"; // Debe coincidir con el 'name' en module.json
+    const packName = "magical-items"; // Debe coincidir con el 'name' en module.json
     const sourcePath = path.join(sourceDirectory, "items");
     const targetPath = path.join(distDirectory, "packs", `${packName}.db`);
 
@@ -112,7 +112,7 @@ async function buildPacks(cb) {
 				console.error(`\t❌ ERROR DE PARSEO en ${filename}: ${e.message}`); 
 			}
 		}
-		
+
 		console.log(`Tamaño del contenido a escribir: ${dbContent.length} bytes.`);
         // 4. Escribir el contenido final en el archivo .db
         await fs.writeFile(targetPath, dbContent);
