@@ -1,7 +1,6 @@
 {
   "name": "Baya Mágica",
   "type": "consumable",
-  "img": "icons/consumables/fruit/berry.png",
   "system": {
     "description": { "value": "Una baya con magia salvaje impredecible." },
     "consumableType": "food",
