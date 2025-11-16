@@ -9,7 +9,7 @@
     "clean:link": "gulp link --clean",
     "changelog": "standard-version --release-as ${RELEASE_VERSION}",
     "apply-version": "node ./scripts/update-module-version.js",
-    "tag-release": "np --no-test"
+    "tag-release": "np --no-tests --no-publish --no-release-draft"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^16.0.3",
