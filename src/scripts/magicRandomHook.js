@@ -1,5 +1,6 @@
 // ========== SIN MIDI-QOL (Consumo manual estándar) ==========
-Hooks.on("dnd5e.useItem", async (item, config, options) => {
+Hooks.on("dnd5e.postUseActivity", async (activity, config, options) => {
+    const item = activity.item;
     const macroName = item.getFlag("magic-random-items", "macro");
     if (!macroName) return;
 
