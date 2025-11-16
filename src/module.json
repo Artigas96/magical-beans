@@ -14,7 +14,7 @@
 		"minimum": "12",
 		"verified": "12"
 	},
-	"esmodules": ["scripts/randomEffect.js"],
+	"esmodules": ["scripts/randomEffect.js", "scripts/magicRandomHook.js"],
 	"packs": [
 		{
 			"name": "magical-items",

@@ -34,24 +34,3 @@ async function randomMagicEffect({actor, item, workflow}) {
         ui.notifications.info("¡Ganas una bendición aleatoria!");
     }
 }
-
-// HOOK que se ejecuta al usar objetos en D&D5e v4 (Foundry V12)
-Hooks.on("dnd5e.useItem", async (item, config, options) => {
-  const flag = item.getFlag("magic-random-items", "macro");
-  if (!flag) return;
-
-  const actor = item.actor;
-
-  // Ejecutar la macro global
-  const macro = game.macros.getName(flag);
-  if (!macro) {
-    ui.notifications.error(`No se encontró la macro: ${flag}`);
-    return;
-  }
-
-  // Lanza tu efecto mágico
-  await macro.execute(actor);
-
-  console.log(`Efecto mágico aleatorio ejecutado para ${item.name}`);
-});
-

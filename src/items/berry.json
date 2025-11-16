@@ -9,7 +9,8 @@
   },
   "flags": {
     "magic-random-items": {
-      "enabled": true
+      "enabled": true,
+      "macro": "randomMagicEffect"
     }
   }
 }

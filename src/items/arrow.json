@@ -11,6 +11,5 @@
     "magic-random-items": {
       "macro": "randomMagicEffect"
     }
-  },
-  "img": "icons/weapons/ammunition/arrow-barbed.webp"
+  }
 }
