@@ -2,7 +2,11 @@
 
 async function randomMagicEffect({actor, item, workflow}) {
     const roll = await new Roll("1d100").roll({async: true});
-    ui.notifications.info(`Resultado mágico: ${roll.total}`);
+    // Mostrar la tirada en el chat como una tirada real en lugar de notificación
+    await roll.toMessage({
+        flavor: `Resultado mágico: ${roll.total}`,
+        speaker: ChatMessage.getSpeaker({ actor })
+    });
 
     if (roll.total <= 20) {
         await actor.applyDamage([{ value: -10 }]);
