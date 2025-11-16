@@ -10,7 +10,7 @@ Hooks.once("ready", () => {
         if (item.type !== "consumable") return;
 
         // Lee el macro desde los flags
-        const macro = item.getFlag("magic-random-items", "macro");
+        const macro = item.getFlag("magical-beans", "macro");
         if (!macro) return;
 
         console.log("Magical Beans | Ejecutando macro:", macro);
