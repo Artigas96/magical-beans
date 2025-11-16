@@ -1,13 +1,11 @@
 // scripts/randomEffect.js
 
-// Función principal
 async function randomMagicEffect({actor, item, workflow}) {
     const roll = await new Roll("1d100").roll({async: true});
     ui.notifications.info(`Resultado mágico: ${roll.total}`);
 
-    // Efectos aleatorios
     if (roll.total <= 20) {
-        await actor.applyDamage([{ value: -10 }]); // curación
+        await actor.applyDamage([{ value: -10 }]);
         ui.notifications.info("¡Efecto: curación!");
     }
     else if (roll.total <= 40) {
@@ -34,3 +32,6 @@ async function randomMagicEffect({actor, item, workflow}) {
         ui.notifications.info("¡Ganas una bendición aleatoria!");
     }
 }
+
+// 🔥 ESTA LÍNEA ES LA CLAVE 🔥
+globalThis.randomMagicEffect = randomMagicEffect;
