@@ -8,9 +8,9 @@
     "activation": { "type": "action", "cost": 1 }
   },
   "flags": {
-    "magic-random-items": {
+    "magical-beans": {
       "enabled": true,
-      "macro": "randomMagicEffect"
+      "macro": "randomMagicEffect(actor)"
     }
   }
 }

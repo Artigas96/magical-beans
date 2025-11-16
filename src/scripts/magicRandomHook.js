@@ -2,51 +2,53 @@ Hooks.once("ready", () => {
     console.log("Magical Beans | Registrando hook de Midi-QOL...");
 
     // ========== SIN MIDI-QOL (Consumo manual estándar) ==========
-    Hooks.on("dnd5e.postUseActivity", async (activity, config, options) => {
-        const item = activity.item;
-        const macroName = item.getFlag("magic-random-items", "macro");
-        if (!macroName) return;
+    Hooks.on("midi-qol.RollComplete", async (workflow) => {
+        const item = workflow.item;
 
-        const actor = item.actor;
+        // Evita errores si no hay item o no es consumible
+        if (!item) return;
+        if (item.type !== "consumable") return;
 
-        const macro = game.macros.getName(macroName);
-        if (!macro) {
-            ui.notifications.error(`No se encontró la macro: ${macroName}`);
-            return;
+        // Lee el macro desde los flags
+        const macro = item.getFlag("magic-random-items", "macro");
+        if (!macro) return;
+
+        console.log("Magical Beans | Ejecutando macro:", macro);
+
+        try {
+        // Evaluamos la expresión: randomMagicEffect(actor, target)
+        const actor = workflow.actor;
+        const target = workflow?.targets?.first() ?? null;
+
+        // eval seguro entre comillas
+        await eval(macro);
+        } catch (err) {
+        console.error("Magical Beans | Error ejecutando macro:", err);
         }
-
-        console.log(`Usando consumible mágico sin MidiQOL: ${item.name}`);
-        await macro.execute(actor);
     });
+
+
 
 
     // ========== CON MIDI-QOL (Impactos, flechas, bombas, etc.) ==========
     Hooks.on("midi-qol.RollComplete", async (workflow) => {
-        if (!workflow.item) return;
-
         const item = workflow.item;
-        const macroName = item.getFlag("magic-random-items", "macro");
-        if (!macroName) return;
+        if (!item) return;
 
-        // Solo disparar si realmente impactó o se consumió
-        if (!workflow.hitTargets?.size && item.system.consumableType !== "bomb") return;
+        // lee desde el scope CORRECTO
+        const macro = item.getFlag("magical-beans", "macro");
+        if (!macro) return;
+
+        console.log("Magical Beans | Ejecutando:", macro);
 
         const actor = workflow.actor;
+        const target = workflow.targets.first() ?? null;
 
-        const macro = game.macros.getName(macroName);
-        if (!macro) {
-            ui.notifications.error(`No se encontró la macro: ${macroName}`);
-            return;
+        try {
+        await eval(macro);
+        } catch (err) {
+        console.error("Magical Beans | Error ejecutando macro:", err);
         }
-
-        console.log(`Ejecutando efecto mágico con MidiQOL para: ${item.name}`);
-
-        // Si hay objetivos, se los pasamos
-        let targetActor = null;
-        if (workflow.hitTargets?.size) {
-            targetActor = [...workflow.hitTargets][0].actor;
-        }
-
-        await macro.execute(actor, targetActor);
     });
+
 });

@@ -8,8 +8,8 @@
     "quantity": 1
   },
   "flags": {
-    "magic-random-items": {
-      "macro": "randomMagicEffect"
+    "magical-beans": {
+      "macro": "randomMagicEffect(actor, target)"
     }
   }
 }
