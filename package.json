@@ -1,4 +1,6 @@
 {
+  "name": "magical-beans",
+  "version": "1.0.14",
   "scripts": {
     "build": "gulp build",
     "build:watch": "gulp watch",
@@ -6,7 +8,8 @@
     "clean": "gulp clean",
     "clean:link": "gulp link --clean",
     "changelog": "standard-version --release-as ${RELEASE_VERSION}",
-    "apply-version": "node ./scripts/update-module-version.js"
+    "apply-version": "node ./scripts/update-module-version.js",
+    "tag-release": "np --no-test"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^16.0.3",
@@ -16,6 +19,7 @@
     "gulp-autoprefixer": "^10.0.0",
     "gulp-dart-sass": "^1.1.0",
     "gulp-sourcemaps": "^3.0.0",
+    "np": "^10.2.0",
     "standard-version": "^9.5.0",
     "vinyl-buffer": "^1.0.1",
     "vinyl-source-stream": "^2.0.0"
