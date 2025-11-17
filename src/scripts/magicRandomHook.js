@@ -28,22 +28,22 @@ Hooks.once("ready", () => {
   //     }
   // });
 
-  for (const pack of game.packs) {
-    if (pack.metadata.name === "magical-beans") {
-      pack.getDocuments().then((docs) => {
-        for (const item of docs) {
-          if (item.name.startsWith("MAGICAL_BEANS")) {
-            item.update({
-              name: game.i18n.localize(item.name),
-              "system.description.value": game.i18n.localize(
-                item.system.description.value
-              ),
-            });
-          }
-        }
-      });
-    }
-  }
+  //   for (const pack of game.packs) {
+  //     if (pack.metadata.name === "magical-beans") {
+  //       pack.getDocuments().then((docs) => {
+  //         for (const item of docs) {
+  //           if (item.name.startsWith("MAGICAL_BEANS")) {
+  //             item.update({
+  //               name: game.i18n.localize(item.name),
+  //               "system.description.value": game.i18n.localize(
+  //                 item.system.description.value
+  //               ),
+  //             });
+  //           }
+  //         }
+  //       });
+  //     }
+  //   }
 
   // ========== CON MIDI-QOL (Impactos, flechas, bombas, etc.) ==========
   Hooks.on("midi-qol.RollComplete", async (workflow) => {

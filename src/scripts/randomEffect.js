@@ -160,9 +160,158 @@ async function randomMagicEffect({ actor, item, workflow }) {
       icon: "icons/magic/unholy/projectile-glowing-bile.webp",
       fx: "bile",
     });
-  }
+  } else if (total <= 80) {
+    const originalLight = {
+      bright: token.document.light.bright,
+      dim: token.document.light.dim,
+      color: token.document.light.color,
+      alpha: token.document.light.alpha,
+      animation: token.document.light.animation,
+    };
 
-  // … aquí seguirían los efectos no temporales del 70 al 100
+    await applyVisualTimedEffect({
+      key: "bombilla",
+      duration: 60,
+      tint: "#FFFFCC", // Tinte amarillo claro
+      icon: "icons/magic/light/light-luminescence-yellow.webp",
+      fx: "light_pulse", // Si tienes FXMaster, usa un efecto de luz o similar
+      onStart: async () => {
+        ui.notifications.info("¡Te conviertes en una potente bombilla de luz!");
+        // Aplicar propiedades de luz intensa
+        await token.document.update({
+          light: {
+            bright: 5,
+            dim: 10,
+            color: "#FFFFAA",
+            alpha: 0.5,
+            animation: { type: "pulse", speed: 2, intensity: 3 },
+          },
+        });
+      },
+      onEnd: async () => {
+        ui.notifications.info("Tu luz se apaga y vuelves a la normalidad.");
+        // Restaurar propiedades de luz originales
+        await token.document.update({
+          light: originalLight,
+        });
+      },
+    });
+  } else if (total <= 90) {
+    // NUEVO EFECTO: PETRIFICADO
+    await applyVisualTimedEffect({
+      key: "petrificado",
+      duration: 60,
+      tint: "#808080", // Tinte gris para simular piedra
+      icon: "icons/magic/defensive/armor-stone-tiled.webp", // Icono de piedra/petrificación
+      fx: null,
+      onStart: async () => {
+        ui.notifications.error(
+          "¡El personaje se petrifica! No puede moverse ni actuar."
+        );
+        // Dependiendo de tu sistema de juego (D&D5e, PF2e, etc.)
+        // aquí podrías crear un Active Effect (o aplicar una condición)
+        // para la inmovilización.
+        // Ejemplo genérico (requiere el módulo 'Combat Utility Belt' o similar para aplicar condiciones):
+        // if (game.cub?.hasCondition) {
+        //   game.cub.addCondition("Paralyzed", {token, skipNotification: true});
+        // }
+      },
+      onEnd: async () => {
+        ui.notifications.info(
+          "La petrificación termina. Vuelves a la normalidad."
+        );
+        // Quitar condición si fue aplicada
+        // if (game.cub?.hasCondition) {
+        //   game.cub.removeCondition("Paralyzed", {token, skipNotification: true});
+        // }
+      },
+    });
+  } else if (total <= 99) {
+    // EFECTO: CURACIÓN 3D4
+    const healRoll = await new Roll("3d4").roll({ async: true });
+
+    // 1. Mostrar el resultado de la curación en el chat
+    await healRoll.toMessage({
+      flavor: `¡Resultado Mágico de Curación! El personaje se cura ${healRoll.total} HP.`,
+      speaker: ChatMessage.getSpeaker({ actor }),
+    });
+
+    const healAmount = healRoll.total;
+
+    // 2. Aplicar la curación al actor (Requiere manejo de sistema de juego)
+
+    // *******************************************************************
+    // LÓGICA DE CURACIÓN ESPECÍFICA DEL SISTEMA (Ejemplo genérico para D&D5e)
+    // *******************************************************************
+
+    // Asumiendo que el actor tiene una estructura de HP en 'system.attributes.hp'
+    const currentHP = actor.system.attributes.hp.value;
+    const maxHP = actor.system.attributes.hp.max;
+
+    // Calcular la nueva vida, sin exceder el máximo (maxHP)
+    const newHP = Math.min(currentHP + healAmount, maxHP);
+
+    // Aplicar la actualización si es necesario
+    if (newHP > currentHP) {
+      await actor.update({ "system.attributes.hp.value": newHP });
+      ui.notifications.info(`El personaje se ha curado ${healAmount} HP.`);
+    } else {
+      ui.notifications.info("El personaje ya tiene la vida máxima.");
+    }
+  } else {
+    // total == 100
+    // EFECTO: CURACIÓN MÁXIMA O INSPIRACIÓN
+    const maxHP = actor.system.attributes.hp.max;
+    const currentHP = actor.system.attributes.hp.value;
+
+    if (currentHP < maxHP) {
+      // 1. Curación Máxima
+      const healAmount = maxHP - currentHP;
+
+      // Aplicar la curación
+      await actor.update({ "system.attributes.hp.value": maxHP });
+
+      // Mostrar el resultado de la curación en el chat
+      ChatMessage.create({
+        flavor: `¡Resultado Mágico CRÍTICO! El personaje se cura COMPLETAMENTE. (+${healAmount} HP)`,
+        speaker: ChatMessage.getSpeaker({ actor }),
+        content: `El personaje es sanado por completo por un destello de luz mágica. ¡Vida máxima restaurada!`,
+      });
+
+      ui.notifications.info(
+        `¡Curación máxima! El personaje ha recuperado ${healAmount} HP.`
+      );
+    } else {
+      // 2. Ya está a vida máxima, otorgar Inspiración.
+
+      // NOTA: 'system.attributes.inspiration' es la ruta común para Inspiración en D&D 5e.
+      const hasInspiration = actor.system.attributes.inspiration;
+
+      if (!hasInspiration) {
+        // Otorgar Inspiración
+        await actor.update({ "system.attributes.inspiration": true });
+
+        ChatMessage.create({
+          flavor: `Resultado Mágico CRÍTICO, ¡Inspiración ganada!`,
+          speaker: ChatMessage.getSpeaker({ actor }),
+          content: `Un aura de magia rodea al personaje, cuya vitalidad ya es máxima. La energía mágica se canaliza en **Inspiración**.`,
+        });
+        ui.notifications.info(
+          "¡Inspiración otorgada! El personaje ya estaba a máxima vida."
+        );
+      } else {
+        // Ya a vida máxima y ya tiene Inspiración
+        ChatMessage.create({
+          flavor: `Resultado Mágico CRÍTICO, pero sin efecto adicional.`,
+          speaker: ChatMessage.getSpeaker({ actor }),
+          content: `Un aura de magia rodea al personaje, pero su vitalidad ya es máxima y ya ha sido Inspirado.`,
+        });
+        ui.notifications.warn(
+          "El personaje ya tiene la vida máxima y ya tiene Inspiración."
+        );
+      }
+    }
+  }
 }
 
 globalThis.randomMagicEffect = randomMagicEffect;
