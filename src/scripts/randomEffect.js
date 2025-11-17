@@ -1,10 +1,16 @@
 // scripts/randomEffect.js
 
 async function randomMagicEffect({ actor, item, workflow }) {
-  // Obtener el token del actor de forma robusta en la escena activa.
-  const token = actor.getActiveTokens(true, true).find((t) => t.isOwner);
+  // Obtener el token del actor de forma robusta en la escena activa
+  const tokens = actor.getActiveTokens(true, true);
+  const token = tokens.find((t) => t.isOwner) || tokens[0];
 
-  const roll = await new Roll("1d100").roll({ async: true });
+  if (!token) {
+    ui.notifications.error("No se encontró un token válido para el actor.");
+    return;
+  }
+
+  const roll = await new Roll("1d100").roll();
 
   await roll.toMessage({
     flavor: `Resultado mágico: ${roll.total}`,
@@ -15,7 +21,6 @@ async function randomMagicEffect({ actor, item, workflow }) {
 
   /**
    * APLICA UN EFECTO TEMPORAL COMPLETO
-   * Se ha corregido el acceso a 'texture' y se usa el scope 'magical-beans'.
    */
   async function applyVisualTimedEffect({
     key,
@@ -26,34 +31,27 @@ async function randomMagicEffect({ actor, item, workflow }) {
     onStart = () => {},
     onEnd = () => {},
   }) {
-    if (!token) {
-      ui.notifications.error(
-        "No hay token en el canvas para aplicar efectos visuales"
-      );
-      return;
-    }
-
-    // Usar el scope corregido: "magical-beans"
+    // Verificar si el efecto ya está activo
     if (actor.getFlag("magical-beans", key)) {
       ui.notifications.warn("Este efecto ya está activo.");
       return;
     }
 
-    // Usar el scope corregido: "magical-beans"
+    // Marcar el efecto como activo
     await actor.setFlag("magical-beans", key, true);
 
-    // Añadir icono de efecto
-    await token.toggleEffect(icon, { active: true });
+    // Añadir icono de efecto usando toggleEffect en el actor
+    await actor.toggleStatusEffect(icon, { active: true });
 
-    // GUARDAR EL TINTE ORIGINAL DE FORMA ROBUSTA
-    const originalTint = token.document.texture?.tint;
+    // Guardar el tinte original
+    const originalTint = token.document.texture?.tint || null;
 
-    // Si hay tintado lo aplicamos
+    // Aplicar tintado si se especifica
     if (tint) {
       await token.document.update({ "texture.tint": tint });
     }
 
-    // FXMASTER
+    // FXMASTER (si está disponible)
     let fxId = null;
     if (fx && game.modules.get("fxmaster")?.active) {
       const tokenCenter = token.center;
@@ -72,16 +70,15 @@ async function randomMagicEffect({ actor, item, workflow }) {
       content: `<b>${key}</b> durará ${duration} segundos.`,
     });
 
-    // Al terminar…
+    // Al terminar el efecto
     setTimeout(async () => {
-      // Usar el scope corregido: "magical-beans"
       await actor.unsetFlag("magical-beans", key);
 
-      // Eliminar icono
-      await token.toggleEffect(icon, { active: false });
+      // Eliminar icono de efecto
+      await actor.toggleStatusEffect(icon, { active: false });
 
-      // Restaurar tintado (solo si se había guardado un valor original)
-      if (originalTint !== undefined) {
+      // Restaurar tintado original
+      if (originalTint !== null) {
         await token.document.update({ "texture.tint": originalTint });
       }
 
@@ -138,7 +135,6 @@ async function randomMagicEffect({ actor, item, workflow }) {
     });
   } else if (total <= 20) {
     // 11-20: Le cambiará el color del pelo
-    // Usaremos tintado para simular el cambio, aunque el efecto es de pelo
     const newTint = `#${Math.floor(Math.random() * 16777215)
       .toString(16)
       .padStart(6, "0")}`;
@@ -152,7 +148,7 @@ async function randomMagicEffect({ actor, item, workflow }) {
       onEnd: () => ui.notifications.info("Tu pelo vuelve a la normalidad."),
     });
   } else if (total <= 30) {
-    // 21-30: Levitara x metros (usaremos 10 metros/pies de elevación)
+    // 21-30: Levitará x metros (10 pies de elevación)
     await applyVisualTimedEffect({
       key: "levitar",
       duration: 20,
@@ -177,7 +173,7 @@ async function randomMagicEffect({ actor, item, workflow }) {
       onEnd: () => ui.notifications.info("Tu lengua vuelve a su tamaño normal"),
     });
   } else if (total <= 50) {
-    // 41-50: En vez de hablar solo podra gritar
+    // 41-50: En vez de hablar solo podrá gritar
     await applyVisualTimedEffect({
       key: "solo-gritos",
       duration: 30,
@@ -187,7 +183,7 @@ async function randomMagicEffect({ actor, item, workflow }) {
       onEnd: () => ui.notifications.info("Vuelves a hablar normalmente."),
     });
   } else if (total <= 60) {
-    // 51-60: En vez de hablar solo podra susurrar
+    // 51-60: En vez de hablar solo podrá susurrar
     await applyVisualTimedEffect({
       key: "solo-susurros",
       duration: 30,
@@ -197,7 +193,7 @@ async function randomMagicEffect({ actor, item, workflow }) {
       onEnd: () => ui.notifications.info("Vuelves a hablar normalmente."),
     });
   } else if (total <= 70) {
-    // 61-70: El personaje empezara a vomitar
+    // 61-70: El personaje empezará a vomitar
     await applyVisualTimedEffect({
       key: "vomitos",
       duration: 10,
@@ -208,14 +204,8 @@ async function randomMagicEffect({ actor, item, workflow }) {
       onEnd: () => ui.notifications.info("Los vómitos han cesado."),
     });
   } else if (total <= 80) {
-    // 71-80: El personaje empezara a emitir luz como si fuera una bombilla
-    const originalLight = {
-      bright: token.document.light.bright,
-      dim: token.document.light.dim,
-      color: token.document.light.color,
-      alpha: token.document.light.alpha,
-      animation: token.document.light.animation,
-    };
+    // 71-80: El personaje empezará a emitir luz como si fuera una bombilla
+    const originalLight = foundry.utils.deepClone(token.document.light);
 
     await applyVisualTimedEffect({
       key: "bombilla",
@@ -236,9 +226,7 @@ async function randomMagicEffect({ actor, item, workflow }) {
         ui.notifications.info("¡Te conviertes en una potente bombilla de luz!");
       },
       onEnd: async () => {
-        await token.document.update({
-          light: originalLight,
-        });
+        await token.document.update({ light: originalLight });
         ui.notifications.info("Tu luz se apaga y vuelves a la normalidad.");
       },
     });
@@ -247,22 +235,51 @@ async function randomMagicEffect({ actor, item, workflow }) {
     await applyVisualTimedEffect({
       key: "petrificado",
       duration: 60,
-      tint: "#808080", // Gris para simular piedra
+      tint: "#808080",
       icon: "icons/magic/defensive/armor-stone-tiled.webp",
       onStart: async () => {
         ui.notifications.error(
           "¡El personaje se petrifica! No puede moverse ni actuar."
         );
-        // Aquí se aplicaría la condición de Inmovilizado/Petrificado del sistema.
+
+        // Aplicar condición de paralizado
+        const effect = CONFIG.statusEffects.find((e) => e.id === "paralysis");
+        if (effect) {
+          await actor.toggleStatusEffect("paralysis", { active: true });
+        } else {
+          // Fallback: crear un Active Effect manualmente
+          await actor.createEmbeddedDocuments("ActiveEffect", [
+            {
+              name: "Petrificado",
+              icon: "icons/magic/defensive/armor-stone-tiled.webp",
+              origin: actor.uuid,
+              disabled: false,
+              duration: { seconds: 60 },
+              flags: { "magical-beans": { petrified: true } },
+            },
+          ]);
+        }
       },
-      onEnd: () =>
+      onEnd: async () => {
         ui.notifications.info(
           "La petrificación termina. Vuelves a la normalidad."
-        ),
+        );
+
+        // Remover condición
+        await actor.toggleStatusEffect("paralysis", { active: false });
+
+        // Remover Active Effect manual si existe
+        const customEffect = actor.effects.find(
+          (e) => e.flags["magical-beans"]?.petrified
+        );
+        if (customEffect) {
+          await customEffect.delete();
+        }
+      },
     });
   } else if (total <= 99) {
     // 91-99: El personaje se cura 3d4
-    const healRoll = await new Roll("3d4").roll({ async: true });
+    const healRoll = await new Roll("3d4").roll();
 
     await healRoll.toMessage({
       flavor: `¡Resultado Mágico de Curación! El personaje se cura ${healRoll.total} HP.`,
@@ -270,8 +287,6 @@ async function randomMagicEffect({ actor, item, workflow }) {
     });
 
     const healAmount = healRoll.total;
-
-    // Aplicar la curación (Ejemplo genérico D&D5e)
     const currentHP = actor.system.attributes.hp.value;
     const maxHP = actor.system.attributes.hp.max;
 
@@ -284,13 +299,11 @@ async function randomMagicEffect({ actor, item, workflow }) {
       ui.notifications.info("El personaje ya tiene la vida máxima.");
     }
   } else {
-    // total == 100
-    // 100: El personaje se cura al maximo, si ya lo esta tiene que estar inspirado
+    // total == 100: Curación máxima o inspiración
     const maxHP = actor.system.attributes.hp.max;
     const currentHP = actor.system.attributes.hp.value;
 
     if (currentHP < maxHP) {
-      // Curación Máxima
       const healAmount = maxHP - currentHP;
 
       await actor.update({ "system.attributes.hp.value": maxHP });
@@ -305,11 +318,9 @@ async function randomMagicEffect({ actor, item, workflow }) {
         `¡Curación máxima! El personaje ha recuperado ${healAmount} HP.`
       );
     } else {
-      // Ya a vida máxima, otorgar Inspiración.
       const hasInspiration = actor.system.attributes.inspiration;
 
       if (!hasInspiration) {
-        // Otorgar Inspiración (Asumiendo D&D5e path)
         await actor.update({ "system.attributes.inspiration": true });
 
         ChatMessage.create({
@@ -321,7 +332,6 @@ async function randomMagicEffect({ actor, item, workflow }) {
           "¡Inspiración otorgada! El personaje ya estaba a máxima vida."
         );
       } else {
-        // Ya a vida máxima y ya tiene Inspiración
         ChatMessage.create({
           flavor: `Resultado Mágico CRÍTICO, pero sin efecto adicional.`,
           speaker: ChatMessage.getSpeaker({ actor }),
@@ -335,4 +345,5 @@ async function randomMagicEffect({ actor, item, workflow }) {
   }
 }
 
+// Exportar la función globalmente
 globalThis.randomMagicEffect = randomMagicEffect;
