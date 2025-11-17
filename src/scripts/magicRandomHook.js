@@ -42,8 +42,15 @@ Hooks.once("ready", () => {
 
         console.log("Magical Beans | Ejecutando:", macro);
 
+        // Variables necesarias:
         const actor = workflow.actor;
         const target = workflow.targets.first() ?? null;
+
+        // AGREGAR ESTO:
+        globalThis.actor = actor;
+        globalThis.item = item;
+        globalThis.workflow = workflow;
+        globalThis.target = target;
 
         try {
         await eval(macro);

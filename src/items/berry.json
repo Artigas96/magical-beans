@@ -10,7 +10,7 @@
   "flags": {
     "magical-beans": {
       "enabled": true,
-      "macro": "randomMagicEffect(actor)"
+      "macro": "randomMagicEffect({actor, item, workflow})"
     }
   }
 }
