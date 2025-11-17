@@ -48,5 +48,17 @@
 		}
 	],
 	"manifest": "This is auto replaced",
-	"download": "This is auto replaced"
+	"download": "This is auto replaced",
+	"dependencies": [
+		{
+		"name": "fxmaster",
+		"type": "module",
+		"manifest": "https://raw.githubusercontent.com/ghost-fvtt/fxmaster/master/module.json"
+		},
+		{
+		"name": "midi-qol",
+		"type": "module",
+		"manifest": "https://raw.githubusercontent.com/kakaroto/Midi-QOL/master/module.json"
+		}
+	]
 }

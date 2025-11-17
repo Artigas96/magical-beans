@@ -1,130 +1,180 @@
 // scripts/randomEffect.js
 
 async function randomMagicEffect({ actor, item, workflow }) {
+
+    const token = canvas.tokens.get(actor.token?.id);
     const roll = await new Roll("1d100").roll({ async: true });
+
     await roll.toMessage({
         flavor: `Resultado mágico: ${roll.total}`,
         speaker: ChatMessage.getSpeaker({ actor })
     });
 
-    const result = roll.total;
+    const total = roll.total;
 
-    // ==============================
-    // 1 — Queda a 1 punto de vida
-    // ==============================
-    if (result === 1) {
-        await actor.update({ "system.attributes.hp.value": 1 });
-        ui.notifications.warn("¡Tu cuerpo se desmorona… pero quedas a 1 punto de vida!");
-    }
+    /**
+     * APLICA UN EFECTO TEMPORAL COMPLETO
+     * - flag
+     * - icono de efecto
+     * - tintado
+     * - fxmaster opcional
+     */
+    async function applyVisualTimedEffect({
+        key,
+        duration,
+        icon = "icons/magic/light/explosion-star-blue.webp",
+        tint = null,
+        fx = null,
+        onStart = () => {},
+        onEnd = () => {},
+    }) {
 
-    // ==============================
-    // 2–10 — Cambia color de piel
-    // ==============================
-    else if (result >= 2 && result <= 10) {
-        await actor.update({ "system.details.appearance": "Tu piel cambia de color de forma mágica." });
-        ui.notifications.info("¡Tu piel cambia de color!");
-    }
+        if (!token) {
+            ui.notifications.error("No hay token en el canvas para aplicar efectos visuales");
+            return;
+        }
 
-    // ==============================
-    // 11–20 — Cambia color del pelo
-    // ==============================
-    else if (result >= 11 && result <= 20) {
-        await actor.update({ "system.details.appearance": "Tu cabello cambia de color repentinamente." });
-        ui.notifications.info("¡Tu pelo cambia de color!");
-    }
+        if (actor.getFlag("random-magic", key)) {
+            ui.notifications.warn("Este efecto ya está activo.");
+            return;
+        }
 
-    // ==============================
-    // 21–30 — Levita X metros
-    // ==============================
-    else if (result >= 21 && result <= 30) {
-        ui.notifications.info("¡Comienzas a levitar varios metros sobre el suelo!");
-        
-        // Animación opcional: efecto de elevación (no físico, solo flavor)
-        ChatMessage.create({
-            content: `<b>${actor.name}</b> levita mágicamente unos metros en el aire.`,
-            speaker: ChatMessage.getSpeaker({ actor })
-        });
-    }
+        await actor.setFlag("random-magic", key, true);
 
-    // ==============================
-    // 31–40 — Le crece la lengua
-    // ==============================
-    else if (result >= 31 && result <= 40) {
-        ChatMessage.create({
-            content: `${actor.name} siente cómo su lengua se alarga grotescamente.`,
-            speaker: ChatMessage.getSpeaker({ actor })
-        });
-        ui.notifications.warn("¡Tu lengua crece de forma antinatural!");
-    }
+        // Añadir icono de efecto
+        await token.object.toggleEffect(icon, { active: true });
 
-    // ==============================
-    // 41–50 — Solo puede gritar
-    // ==============================
-    else if (result >= 41 && result <= 50) {
-        actor.setFlag("magical-beans", "voiceEffect", "shout");
-        ui.notifications.warn("¡Solo puedes comunicarte gritando!");
-    }
+        // Guardamos el tinte original
+        const originalTint = token.document.texture.tint;
 
-    // ==============================
-    // 51–60 — Solo puede susurrar
-    // ==============================
-    else if (result >= 51 && result <= 60) {
-        actor.setFlag("magical-beans", "voiceEffect", "whisper");
-        ui.notifications.warn("¡Tu voz se reduce a un susurro!");
-    }
+        // Si hay tintado lo aplicamos
+        if (tint) {
+            await token.document.update({ "texture.tint": tint });
+        }
 
-    // ==============================
-    // 61–70 — Vomita
-    // ==============================
-    else if (result >= 61 && result <= 70) {
-        ChatMessage.create({
-            content: `${actor.name} empieza a vomitar de manera incontrolable 🤮`,
-            speaker: ChatMessage.getSpeaker({ actor })
-        });
-        ui.notifications.info("No puedes evitar vomitar...");
-    }
+        // FXMASTER
+        let fxId = null;
+        if (fx && game.modules.get("fxmaster")?.active) {
+            fxId = await canvas.fxmaster.playEffects({
+                name: fx,
+                x: token.center.x,
+                y: token.center.y,
+                anchor: { x: 0.5, y: 0.5 },
+            });
+        }
 
-    // ==============================
-    // 71–80 — Emite luz como una bombilla
-    // ==============================
-    else if (result >= 71 && result <= 80) {
-        await actor.update({
-            "system.attributes.senses.darkvision": 9999
-        });
-
-        ui.notifications.info("¡Brillas como una bombilla!");
-    }
-
-    // ==============================
-    // 81–90 — Petrificación
-    // ==============================
-    else if (result >= 81 && result <= 90) {
-        await actor.update({ "system.attributes.movement.all": 0 });
+        onStart();
 
         ChatMessage.create({
-            content: `${actor.name} se convierte en piedra completamente.`,
-            speaker: ChatMessage.getSpeaker({ actor })
+            speaker: ChatMessage.getSpeaker({ actor }),
+            content: `<b>${key}</b> durará ${duration} segundos.`
         });
 
-        ui.notifications.error("¡Te petrificas!");
+        // Al terminar…
+        setTimeout(async () => {
+
+            await actor.unsetFlag("random-magic", key);
+
+            // Eliminar icono
+            await token.object.toggleEffect(icon, { active: false });
+
+            // Restaurar tintado
+            if (tint) {
+                await token.document.update({ "texture.tint": originalTint });
+            }
+
+            // Detener FX
+            if (fxId && game.modules.get("fxmaster")?.active) {
+                canvas.fxmaster.removeEffects(fxId);
+            }
+
+            onEnd();
+
+            ChatMessage.create({
+                speaker: ChatMessage.getSpeaker({ actor }),
+                content: `El efecto <b>${key}</b> ha terminado.`
+            });
+
+        }, duration * 1000);
     }
 
-    // ==============================
-    // 91–99 — Se cura
-    // ==============================
-    else if (result >= 91 && result <= 99) {
-        await actor.applyDamage([{ value: -20 }]);
-        ui.notifications.info("¡Un aura mágica te cura!");
+    // ----------- EFECTOS -----------
+
+    if (total <= 10) {
+        await applyVisualTimedEffect({
+            key: "piel-arcoiris",
+            duration: 60,
+            tint: "#00FFFF",
+            icon: "icons/magic/control/hypnosis-mesmerism-swirl.webp",
+            fx: "magic_missile", // FXMaster efecto simple
+            onStart: () => ui.notifications.info("¡Tu piel se vuelve de colores brillantes!"),
+            onEnd: () => ui.notifications.info("Tu piel vuelve a la normalidad.")
+        });
     }
 
-    // ==============================
-    // 100 — Cura completa
-    // ==============================
-    else if (result === 100) {
-        await actor.update({ "system.attributes.hp.value": actor.system.attributes.hp.max });
-        ui.notifications.info("¡Te curas por completo!");
+    else if (total <= 20) {
+        await applyVisualTimedEffect({
+            key: "luz-intensa",
+            duration: 60,
+            tint: "#FFFFAA",
+            icon: "icons/magic/light/explosion-star-yellow.webp",
+            fx: "light",
+            onStart: () => ui.notifications.info("¡Brillas como si fueras una bombilla!"),
+            onEnd: () => ui.notifications.info("Dejas de emitir luz.")
+        });
     }
+
+    else if (total <= 30) {
+        await applyVisualTimedEffect({
+            key: "levitar",
+            duration: 20,
+            icon: "icons/magic/air/wind-swirl-blue.webp",
+            fx: "energy",
+            onStart: async () => {
+                await token.document.update({ elevation: 10 });
+            },
+            onEnd: async () => {
+                await token.document.update({ elevation: 0 });
+            }
+        });
+    }
+
+    else if (total <= 40) {
+        await applyVisualTimedEffect({
+            key: "lengua-larga",
+            duration: 120,
+            icon: "icons/creatures/eyes/lizard-single-red.webp",
+            onStart: () => ui.notifications.info("Tu lengua crece de forma grotesca"),
+            onEnd: () => ui.notifications.info("Tu lengua vuelve a su tamaño normal")
+        });
+    }
+
+    else if (total <= 50) {
+        await applyVisualTimedEffect({
+            key: "solo-gritos",
+            duration: 30,
+            icon: "icons/skills/social/intimidate-shout.webp",
+        });
+    }
+
+    else if (total <= 60) {
+        await applyVisualTimedEffect({
+            key: "solo-susurros",
+            duration: 30,
+            icon: "icons/skills/social/intimidate-shout-silent.webp",
+        });
+    }
+
+    else if (total <= 70) {
+        await applyVisualTimedEffect({
+            key: "vomitos",
+            duration: 10,
+            icon: "icons/magic/unholy/projectile-glowing-bile.webp",
+            fx: "bile",
+        });
+    }
+
+    // … aquí seguirían los efectos no temporales del 70 al 100
 }
 
-// 🔥 Clave para Foundry V12
 globalThis.randomMagicEffect = randomMagicEffect;
