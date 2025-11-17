@@ -1,4 +1,8 @@
 {
-  "MAGICAL_BEANS.Name": "Baya Mágica",
-  "MAGICAL_BEANS.Description": "Una baya con magia salvaje impredecible."
+  "MAGICAL_BEANS": {
+    "BERRY": {
+      "Name": "Baya Mágica",
+      "Description": "Una baya con magia salvaje impredecible."
+    }
+  }
 }
