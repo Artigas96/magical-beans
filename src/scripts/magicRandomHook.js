@@ -1,62 +1,75 @@
 //scripts/magicRandomHook.js
 Hooks.once("ready", () => {
-    console.log("Magical Beans | Registrando hook de Midi-QOL...");
+  console.log("Magical Beans | Registrando hook de Midi-QOL...");
 
-    // ========== SIN MIDI-QOL (Consumo manual estándar) ==========
-    // Hooks.on("midi-qol.RollComplete", async (workflow) => {
-    //     const item = workflow.item;
+  // ========== SIN MIDI-QOL (Consumo manual estándar) ==========
+  // Hooks.on("midi-qol.RollComplete", async (workflow) => {
+  //     const item = workflow.item;
 
-    //     // Evita errores si no hay item o no es consumible
-    //     if (!item) return;
-    //     if (item.type !== "consumable") return;
+  //     // Evita errores si no hay item o no es consumible
+  //     if (!item) return;
+  //     if (item.type !== "consumable") return;
 
-    //     // Lee el macro desde los flags
-    //     const macro = item.getFlag("magical-beans", "macro");
-    //     if (!macro) return;
+  //     // Lee el macro desde los flags
+  //     const macro = item.getFlag("magical-beans", "macro");
+  //     if (!macro) return;
 
-    //     console.log("Magical Beans | Ejecutando macro:", macro);
+  //     console.log("Magical Beans | Ejecutando macro:", macro);
 
-    //     try {
-    //     // Evaluamos la expresión: randomMagicEffect(actor, target)
-    //     const actor = workflow.actor;
-    //     const target = workflow?.targets?.first() ?? null;
+  //     try {
+  //     // Evaluamos la expresión: randomMagicEffect(actor, target)
+  //     const actor = workflow.actor;
+  //     const target = workflow?.targets?.first() ?? null;
 
-    //     // eval seguro entre comillas
-    //     await eval(macro);
-    //     } catch (err) {
-    //     console.error("Magical Beans | Error ejecutando macro:", err);
-    //     }
-    // });
+  //     // eval seguro entre comillas
+  //     await eval(macro);
+  //     } catch (err) {
+  //     console.error("Magical Beans | Error ejecutando macro:", err);
+  //     }
+  // });
 
-
-
-
-    // ========== CON MIDI-QOL (Impactos, flechas, bombas, etc.) ==========
-    Hooks.on("midi-qol.RollComplete", async (workflow) => {
-        const item = workflow.item;
-        if (!item) return;
-
-        // lee desde el scope CORRECTO
-        const macro = item.getFlag("magical-beans", "macro");
-        if (!macro) return;
-
-        console.log("Magical Beans | Ejecutando:", macro);
-
-        // Variables necesarias:
-        const actor = workflow.actor;
-        const target = workflow.targets.first() ?? null;
-
-        // AGREGAR ESTO:
-        globalThis.actor = actor;
-        globalThis.item = item;
-        globalThis.workflow = workflow;
-        globalThis.target = target;
-
-        try {
-        await eval(macro);
-        } catch (err) {
-        console.error("Magical Beans | Error ejecutando macro:", err);
+  for (const pack of game.packs) {
+    if (pack.metadata.name === "magical-beans") {
+      pack.getDocuments().then((docs) => {
+        for (const item of docs) {
+          if (item.name.startsWith("MAGICAL_BEANS")) {
+            item.update({
+              name: game.i18n.localize(item.name),
+              "system.description.value": game.i18n.localize(
+                item.system.description.value
+              ),
+            });
+          }
         }
-    });
+      });
+    }
+  }
 
+  // ========== CON MIDI-QOL (Impactos, flechas, bombas, etc.) ==========
+  Hooks.on("midi-qol.RollComplete", async (workflow) => {
+    const item = workflow.item;
+    if (!item) return;
+
+    // lee desde el scope CORRECTO
+    const macro = item.getFlag("magical-beans", "macro");
+    if (!macro) return;
+
+    console.log("Magical Beans | Ejecutando:", macro);
+
+    // Variables necesarias:
+    const actor = workflow.actor;
+    const target = workflow.targets.first() ?? null;
+
+    // AGREGAR ESTO:
+    globalThis.actor = actor;
+    globalThis.item = item;
+    globalThis.workflow = workflow;
+    globalThis.target = target;
+
+    try {
+      await eval(macro);
+    } catch (err) {
+      console.error("Magical Beans | Error ejecutando macro:", err);
+    }
+  });
 });

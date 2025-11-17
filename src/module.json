@@ -1,64 +1,62 @@
 {
-	"id": "magical-beans",
-	"title": "Magical Beans",
-	"description": "Tres objetos que aplican efectos aleatorios usando un d100.",
-	"authors": [
-		{
-			"name": "Artigas96",
-			"discord": "artigas96"
-		}
-	],
-	"url": "This is auto replaced",
-	"version": "This is auto replaced",
-	"compatibility": {
-		"minimum": "12",
-		"verified": "12"
-	},
-	"esmodules": ["scripts/randomEffect.js", "scripts/magicRandomHook.js"],
-	"packs": [
-		{
-			"name": "magical-items",
-			"label": "Magical Beans Items",
-			"path": "packs/magical-items.db",
-			"type": "Item",
-			"system": [
-				"dnd5e"
-			],
-			"private": false,
-			"ownership": {
-                "PLAYER": "OBSERVER",
-                "ASSISTANT": "OWNER",
-                "GAMEMASTER": "OWNER"
-            }
-		}
-	],
-	"flags": {
-		"magical-beans": {}
-	},
-	"languages": [
-		{
-			"lang": "en",
-			"name": "English",
-			"path": "lang/en.json"
-		},
-		{
-			"lang": "es",
-			"name": "Español",
-			"path": "lang/es.json"
-		}
-	],
-	"manifest": "This is auto replaced",
-	"download": "This is auto replaced",
-	"dependencies": [
-		{
-		"name": "fxmaster",
-		"type": "module",
-		"manifest": "https://raw.githubusercontent.com/ghost-fvtt/fxmaster/master/module.json"
-		},
-		{
-		"name": "midi-qol",
-		"type": "module",
-		"manifest": "https://raw.githubusercontent.com/kakaroto/Midi-QOL/master/module.json"
-		}
-	]
+  "id": "magical-beans",
+  "title": "Magical Beans",
+  "description": "Tres objetos que aplican efectos aleatorios usando un d100.",
+  "authors": [
+    {
+      "name": "Artigas96",
+      "discord": "artigas96"
+    }
+  ],
+  "url": "This is auto replaced",
+  "version": "This is auto replaced",
+  "compatibility": {
+    "minimum": "12",
+    "verified": "12"
+  },
+  "esmodules": ["scripts/randomEffect.js", "scripts/magicRandomHook.js"],
+  "packs": [
+    {
+      "name": "magical-items",
+      "label": "Magical Beans Items",
+      "path": "packs/magical-items.db",
+      "type": "Item",
+      "system": ["dnd5e"],
+      "private": false,
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER",
+        "GAMEMASTER": "OWNER"
+      }
+    }
+  ],
+  "flags": {
+    "magical-beans": {}
+  },
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    },
+    {
+      "lang": "es",
+      "name": "Español",
+      "path": "lang/es.json"
+    }
+  ],
+  "manifest": "This is auto replaced",
+  "download": "This is auto replaced",
+  "dependencies": [
+    {
+      "name": "fxmaster",
+      "type": "module",
+      "manifest": "https://raw.githubusercontent.com/ghost-fvtt/fxmaster/master/module.json"
+    },
+    {
+      "name": "midi-qol",
+      "type": "module",
+      "manifest": "https://raw.githubusercontent.com/kakaroto/Midi-QOL/master/module.json"
+    }
+  ]
 }

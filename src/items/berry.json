@@ -1,8 +1,8 @@
 {
-  "name": "Baya Mágica",
+  "name": "MAGICAL_BEANS.Name",
   "type": "consumable",
   "system": {
-    "description": { "value": "Una baya con magia salvaje impredecible." },
+    "description": { "value": "MAGICAL_BEANS.Description" },
     "consumableType": "food",
     "uses": { "value": 1, "max": 1, "autoDestroy": true },
     "activation": { "type": "action", "cost": 1 }
