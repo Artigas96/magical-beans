@@ -34,12 +34,12 @@ async function randomMagicEffect({ actor, item, workflow }) {
       return;
     }
 
-    if (actor.getFlag("random-magic", key)) {
+    if (actor.getFlag("magical-beans", key)) {
       ui.notifications.warn("Este efecto ya está activo.");
       return;
     }
 
-    await actor.setFlag("random-magic", key, true);
+    await actor.setFlag("magical-beans", key, true);
 
     // Añadir icono de efecto
     await token.object.toggleEffect(icon, { active: true });
@@ -72,7 +72,7 @@ async function randomMagicEffect({ actor, item, workflow }) {
 
     // Al terminar…
     setTimeout(async () => {
-      await actor.unsetFlag("random-magic", key);
+      await actor.unsetFlag("magical-beans", key);
 
       // Eliminar icono
       await token.object.toggleEffect(icon, { active: false });
