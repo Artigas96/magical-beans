@@ -127,7 +127,7 @@ async function randomMagicEffect({ actor, item, workflow }) {
       key: "piel-arcoiris",
       duration: 60,
       tint: newTint,
-      icon: "icons/magic/control/hypnosis-mesmerism-swirl.webp",
+      //   icon: "icons/magic/control/hypnosis-mesmerism-swirl.webp",
       fx: "magic_missile",
       onStart: () =>
         ui.notifications.info("¡Tu piel se vuelve de un color brillante!"),
@@ -142,7 +142,7 @@ async function randomMagicEffect({ actor, item, workflow }) {
       key: "pelo-color",
       duration: 60,
       tint: newTint,
-      icon: "icons/equipment/head/hat-cowboy-red.webp",
+      //   icon: "icons/equipment/head/hat-cowboy-red.webp",
       onStart: () =>
         ui.notifications.info("Tu pelo cambia a un color inesperado."),
       onEnd: () => ui.notifications.info("Tu pelo vuelve a la normalidad."),
@@ -152,7 +152,7 @@ async function randomMagicEffect({ actor, item, workflow }) {
     await applyVisualTimedEffect({
       key: "levitar",
       duration: 20,
-      icon: "icons/magic/air/wind-swirl-blue.webp",
+      //   icon: "icons/magic/air/wind-swirl-blue.webp",
       fx: "energy",
       onStart: async () => {
         await token.document.update({ elevation: 10 });
@@ -168,7 +168,7 @@ async function randomMagicEffect({ actor, item, workflow }) {
     await applyVisualTimedEffect({
       key: "lengua-larga",
       duration: 120,
-      icon: "icons/creatures/eyes/lizard-single-red.webp",
+      //   icon: "icons/creatures/eyes/lizard-single-red.webp",
       onStart: () => ui.notifications.info("Tu lengua crece de forma grotesca"),
       onEnd: () => ui.notifications.info("Tu lengua vuelve a su tamaño normal"),
     });
@@ -177,7 +177,7 @@ async function randomMagicEffect({ actor, item, workflow }) {
     await applyVisualTimedEffect({
       key: "solo-gritos",
       duration: 30,
-      icon: "icons/skills/social/intimidate-shout.webp",
+      //   icon: "icons/skills/social/intimidate-shout.webp",
       onStart: () =>
         ui.notifications.info("¡Solo puedes comunicarte gritando!"),
       onEnd: () => ui.notifications.info("Vuelves a hablar normalmente."),
@@ -187,7 +187,7 @@ async function randomMagicEffect({ actor, item, workflow }) {
     await applyVisualTimedEffect({
       key: "solo-susurros",
       duration: 30,
-      icon: "icons/skills/social/intimidate-shout-silent.webp",
+      //   icon: "icons/skills/social/intimidate-shout-silent.webp",
       onStart: () =>
         ui.notifications.info("¡Solo puedes comunicarte susurrando!"),
       onEnd: () => ui.notifications.info("Vuelves a hablar normalmente."),
@@ -197,7 +197,7 @@ async function randomMagicEffect({ actor, item, workflow }) {
     await applyVisualTimedEffect({
       key: "vomitos",
       duration: 10,
-      icon: "icons/magic/unholy/projectile-glowing-bile.webp",
+      //   icon: "icons/magic/unholy/projectile-glowing-bile.webp",
       fx: "bile",
       onStart: () =>
         ui.notifications.info("¡Empiezas a vomitar descontroladamente!"),
@@ -211,7 +211,7 @@ async function randomMagicEffect({ actor, item, workflow }) {
       key: "bombilla",
       duration: 60,
       tint: "#FFFFCC",
-      icon: "icons/magic/light/light-luminescence-yellow.webp",
+      //   icon: "icons/magic/light/light-luminescence-yellow.webp",
       fx: "light_pulse",
       onStart: async () => {
         await token.document.update({
@@ -236,7 +236,7 @@ async function randomMagicEffect({ actor, item, workflow }) {
       key: "petrificado",
       duration: 60,
       tint: "#808080",
-      icon: "icons/magic/defensive/armor-stone-tiled.webp",
+      //   icon: "icons/magic/defensive/armor-stone-tiled.webp",
       onStart: async () => {
         ui.notifications.error(
           "¡El personaje se petrifica! No puede moverse ni actuar."
@@ -251,7 +251,7 @@ async function randomMagicEffect({ actor, item, workflow }) {
           await actor.createEmbeddedDocuments("ActiveEffect", [
             {
               name: "Petrificado",
-              icon: "icons/magic/defensive/armor-stone-tiled.webp",
+              //   icon: "icons/magic/defensive/armor-stone-tiled.webp",
               origin: actor.uuid,
               disabled: false,
               duration: { seconds: 60 },

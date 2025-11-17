@@ -1,4 +1,8 @@
 {
-  "MAGICAL_BEANS.Name": "Magic Berry",
-  "MAGICAL_BEANS.Description": "A berry filled with unpredictable wild magic."
+  "MAGICAL_BEANS": {
+    "BERRY": {
+      "Name": "Magic Berry",
+      "Description": "A berry filled with unpredictable wild magic."
+    }
+  }
 }

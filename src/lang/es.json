@@ -4,5 +4,7 @@
       "Name": "Baya Mágica",
       "Description": "Una baya con magia salvaje impredecible."
     }
-  }
+  },
+  "magical-items.magical-berry.name": "Baya Mágica",
+  "magical-items.magical-berry.description": "Una baya llena de magia salvaje impredecible."
 }
