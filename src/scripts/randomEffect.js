@@ -1,7 +1,7 @@
 // scripts/randomEffect.js
 
 async function randomMagicEffect({ actor, item, workflow }) {
-  const token = canvas.tokens.get(actor.token?.id);
+  const token = actor.getActiveTokens(true, true).find((t) => t.isOwner);
   const roll = await new Roll("1d100").roll({ async: true });
 
   await roll.toMessage({
