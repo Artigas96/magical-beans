@@ -1,5 +1,9 @@
 // scripts/randomEffect.js
 
+// Map para almacenar los timeout IDs activos por actor y efecto
+// Estructura: Map<actorId, Map<effectKey, timeoutId>>
+const activeEffectTimeouts = new Map();
+
 async function randomMagicEffect({ actor, item, workflow }) {
   // Helper para localizar textos
   const i18n = (key, data = {}) => {
@@ -33,8 +37,8 @@ async function randomMagicEffect({ actor, item, workflow }) {
     icon = "icons/magic/light/explosion-star-blue.webp",
     tint = null,
     fx = null,
-    onStart = () => {},
-    onEnd = () => {},
+    onStart = () => { },
+    onEnd = () => { },
   }) {
     // Verificar si el efecto ya está activo
     if (actor.getFlag("magical-beans", key)) {
@@ -44,6 +48,11 @@ async function randomMagicEffect({ actor, item, workflow }) {
 
     // Marcar el efecto como activo
     await actor.setFlag("magical-beans", key, true);
+
+    // Inicializar el Map de timeouts para este actor si no existe
+    if (!activeEffectTimeouts.has(actor.id)) {
+      activeEffectTimeouts.set(actor.id, new Map());
+    }
 
     // Crear un Active Effect visual con icono
     const effectData = {
@@ -96,7 +105,7 @@ async function randomMagicEffect({ actor, item, workflow }) {
     });
 
     // Al terminar el efecto
-    setTimeout(async () => {
+    const timeoutId = setTimeout(async () => {
       await actor.unsetFlag("magical-beans", key);
 
       // Eliminar el Active Effect creado
@@ -120,7 +129,19 @@ async function randomMagicEffect({ actor, item, workflow }) {
         speaker: ChatMessage.getSpeaker({ actor }),
         content: i18n("MAGICAL_BEANS.MESSAGES.EffectEnded", { effect: key }),
       });
+
+      // Limpiar el timeout del Map
+      const actorTimeouts = activeEffectTimeouts.get(actor.id);
+      if (actorTimeouts) {
+        actorTimeouts.delete(key);
+        if (actorTimeouts.size === 0) {
+          activeEffectTimeouts.delete(actor.id);
+        }
+      }
     }, duration * 1000);
+
+    // Guardar el timeout ID en el Map
+    activeEffectTimeouts.get(actor.id).set(key, timeoutId);
   }
 
   // ----------- EFECTOS POR RANGO DE 1D100 -----------
@@ -409,5 +430,6 @@ async function randomMagicEffect({ actor, item, workflow }) {
   }
 }
 
-// Exportar la función globalmente
+// Exportar la función y el Map de timeouts globalmente
 globalThis.randomMagicEffect = randomMagicEffect;
+globalThis.activeEffectTimeouts = activeEffectTimeouts;

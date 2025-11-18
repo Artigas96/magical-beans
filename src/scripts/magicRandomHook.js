@@ -37,4 +37,47 @@ Hooks.once("ready", () => {
   });
 
   console.log("Magical Beans | Hook registrado correctamente");
+
+  // Hook para detectar cuando se elimina manualmente un Active Effect
+  Hooks.on("deleteActiveEffect", async (effect, options, userId) => {
+    // Verificar si es un efecto temporal de magical-beans
+    const isTemporaryEffect = effect.getFlag(
+      "magical-beans",
+      "temporaryEffect"
+    );
+    if (!isTemporaryEffect) return;
+
+    const effectKey = effect.getFlag("magical-beans", "effectKey");
+    if (!effectKey) return;
+
+    const actor = effect.parent;
+    if (!actor) return;
+
+    console.log(
+      `Magical Beans | Efecto "${effectKey}" eliminado manualmente, limpiando...`
+    );
+
+    // Limpiar el flag del actor
+    await actor.unsetFlag("magical-beans", effectKey);
+
+    // Cancelar el timeout si existe
+    if (globalThis.activeEffectTimeouts) {
+      const actorTimeouts = globalThis.activeEffectTimeouts.get(actor.id);
+      if (actorTimeouts) {
+        const timeoutId = actorTimeouts.get(effectKey);
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+          actorTimeouts.delete(effectKey);
+          console.log(
+            `Magical Beans | Timeout cancelado para "${effectKey}"`
+          );
+
+          // Limpiar el Map del actor si está vacío
+          if (actorTimeouts.size === 0) {
+            globalThis.activeEffectTimeouts.delete(actor.id);
+          }
+        }
+      }
+    }
+  });
 });
