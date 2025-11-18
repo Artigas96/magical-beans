@@ -14,14 +14,20 @@
     "minimum": "12",
     "verified": "12"
   },
-  "esmodules": ["scripts/randomEffect.js", "scripts/magicRandomHook.js"],
+  "esmodules": [
+    "scripts/randomEffect.js",
+    "scripts/magicRandomHook.js",
+    "scripts/localizeItems.js"
+  ],
   "packs": [
     {
       "name": "magical-items",
       "label": "Magical Beans Items",
       "path": "packs/magical-items.db",
       "type": "Item",
-      "system": ["dnd5e"],
+      "system": [
+        "dnd5e"
+      ],
       "private": false,
       "ownership": {
         "PLAYER": "OBSERVER",

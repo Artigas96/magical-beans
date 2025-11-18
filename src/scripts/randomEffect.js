@@ -33,6 +33,7 @@ async function randomMagicEffect({ actor, item, workflow }) {
    */
   async function applyVisualTimedEffect({
     key,
+    nameKey,
     duration,
     icon = "icons/magic/light/explosion-star-blue.webp",
     tint = null,
@@ -54,9 +55,12 @@ async function randomMagicEffect({ actor, item, workflow }) {
       activeEffectTimeouts.set(actor.id, new Map());
     }
 
+    // Obtener el nombre localizado para mostrar
+    const localizedName = i18n(nameKey);
+
     // Crear un Active Effect visual con icono
     const effectData = {
-      name: key,
+      name: localizedName,
       icon: icon,
       origin: actor.uuid,
       disabled: false,
@@ -99,7 +103,7 @@ async function randomMagicEffect({ actor, item, workflow }) {
     ChatMessage.create({
       speaker: ChatMessage.getSpeaker({ actor }),
       content: i18n("MAGICAL_BEANS.MESSAGES.EffectDuration", {
-        effect: key,
+        effect: localizedName,
         duration: duration,
       }),
     });
@@ -127,7 +131,7 @@ async function randomMagicEffect({ actor, item, workflow }) {
 
       ChatMessage.create({
         speaker: ChatMessage.getSpeaker({ actor }),
-        content: i18n("MAGICAL_BEANS.MESSAGES.EffectEnded", { effect: key }),
+        content: i18n("MAGICAL_BEANS.MESSAGES.EffectEnded", { effect: localizedName }),
       });
 
       // Limpiar el timeout del Map
@@ -178,7 +182,8 @@ async function randomMagicEffect({ actor, item, workflow }) {
       .toString(16)
       .padStart(6, "0")}`;
     await applyVisualTimedEffect({
-      key: i18n("MAGICAL_BEANS.EFFECTS.RainbowSkin.Name"),
+      key: "rainbow-skin",
+      nameKey: "MAGICAL_BEANS.EFFECTS.RainbowSkin.Name",
       duration: 60,
       icon: "icons/magic/light/orb-lightbulb-gray.webp",
       tint: newTint,
@@ -198,7 +203,8 @@ async function randomMagicEffect({ actor, item, workflow }) {
       .toString(16)
       .padStart(6, "0")}`;
     await applyVisualTimedEffect({
-      key: i18n("MAGICAL_BEANS.EFFECTS.ColorfulHair.Name"),
+      key: "colorful-hair",
+      nameKey: "MAGICAL_BEANS.EFFECTS.ColorfulHair.Name",
       duration: 60,
       icon: "icons/magic/light/beam-rays-purple.webp",
       tint: newTint,
@@ -214,7 +220,8 @@ async function randomMagicEffect({ actor, item, workflow }) {
   } else if (total <= 30) {
     // 21-30: Levitará x metros (10 pies de elevación)
     await applyVisualTimedEffect({
-      key: i18n("MAGICAL_BEANS.EFFECTS.Levitate.Name"),
+      key: "levitate",
+      nameKey: "MAGICAL_BEANS.EFFECTS.Levitate.Name",
       duration: 20,
       icon: "icons/magic/air/wind-vortex-swirl-purple.webp",
       fx: "energy",
@@ -234,7 +241,8 @@ async function randomMagicEffect({ actor, item, workflow }) {
   } else if (total <= 40) {
     // 31-40: Le crecerá la lengua
     await applyVisualTimedEffect({
-      key: i18n("MAGICAL_BEANS.EFFECTS.LongTongue.Name"),
+      key: "long-tongue",
+      nameKey: "MAGICAL_BEANS.EFFECTS.LongTongue.Name",
       duration: 120,
       icon: "icons/magic/unholy/mouth-teeth-long.webp",
       onStart: () =>
@@ -249,7 +257,8 @@ async function randomMagicEffect({ actor, item, workflow }) {
   } else if (total <= 50) {
     // 41-50: En vez de hablar solo podrá gritar
     await applyVisualTimedEffect({
-      key: i18n("MAGICAL_BEANS.EFFECTS.OnlyScreams.Name"),
+      key: "only-screams",
+      nameKey: "MAGICAL_BEANS.EFFECTS.OnlyScreams.Name",
       duration: 30,
       icon: "icons/magic/sonic/explosion-shock-sound-wave.webp",
       onStart: () =>
@@ -264,7 +273,8 @@ async function randomMagicEffect({ actor, item, workflow }) {
   } else if (total <= 60) {
     // 51-60: En vez de hablar solo podrá susurrar
     await applyVisualTimedEffect({
-      key: i18n("MAGICAL_BEANS.EFFECTS.OnlyWhispers.Name"),
+      key: "only-whispers",
+      nameKey: "MAGICAL_BEANS.EFFECTS.OnlyWhispers.Name",
       duration: 30,
       icon: "icons/magic/sonic/scream-wail-shout-teal.webp",
       onStart: () =>
@@ -279,7 +289,8 @@ async function randomMagicEffect({ actor, item, workflow }) {
   } else if (total <= 70) {
     // 61-70: El personaje empezará a vomitar
     await applyVisualTimedEffect({
-      key: i18n("MAGICAL_BEANS.EFFECTS.Vomiting.Name"),
+      key: "vomiting",
+      nameKey: "MAGICAL_BEANS.EFFECTS.Vomiting.Name",
       duration: 10,
       icon: "icons/magic/water/projectile-stream-vomit.webp",
       fx: "bile",
@@ -297,7 +308,8 @@ async function randomMagicEffect({ actor, item, workflow }) {
     const originalLight = foundry.utils.deepClone(token.document.light);
 
     await applyVisualTimedEffect({
-      key: i18n("MAGICAL_BEANS.EFFECTS.Lightbulb.Name"),
+      key: "lightbulb",
+      nameKey: "MAGICAL_BEANS.EFFECTS.Lightbulb.Name",
       duration: 60,
       icon: "icons/magic/light/orb-lightbulb.webp",
       tint: "#FFFFCC",
@@ -326,7 +338,8 @@ async function randomMagicEffect({ actor, item, workflow }) {
   } else if (total <= 90) {
     // 81-90: El personaje se petrifica
     await applyVisualTimedEffect({
-      key: i18n("MAGICAL_BEANS.EFFECTS.Petrified.Name"),
+      key: "petrified",
+      nameKey: "MAGICAL_BEANS.EFFECTS.Petrified.Name",
       duration: 60,
       icon: "icons/magic/earth/strike-body-stone-cracked.webp",
       tint: "#808080",
