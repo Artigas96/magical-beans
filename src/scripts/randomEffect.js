@@ -45,8 +45,25 @@ async function randomMagicEffect({ actor, item, workflow }) {
     // Marcar el efecto como activo
     await actor.setFlag("magical-beans", key, true);
 
-    // Añadir icono de efecto usando toggleEffect en el actor
-    await actor.toggleStatusEffect(icon, { active: true });
+    // Crear un Active Effect visual con icono
+    const effectData = {
+      name: key,
+      icon: icon,
+      origin: actor.uuid,
+      disabled: false,
+      duration: { seconds: duration },
+      flags: {
+        "magical-beans": {
+          temporaryEffect: true,
+          effectKey: key,
+        },
+      },
+    };
+
+    const [createdEffect] = await actor.createEmbeddedDocuments(
+      "ActiveEffect",
+      [effectData]
+    );
 
     // Guardar el tinte original
     const originalTint = token.document.texture?.tint || null;
@@ -82,8 +99,10 @@ async function randomMagicEffect({ actor, item, workflow }) {
     setTimeout(async () => {
       await actor.unsetFlag("magical-beans", key);
 
-      // Eliminar icono de efecto
-      await actor.toggleStatusEffect(icon, { active: false });
+      // Eliminar el Active Effect creado
+      if (createdEffect) {
+        await createdEffect.delete();
+      }
 
       // Restaurar tintado original
       if (originalTint !== null) {
@@ -140,6 +159,7 @@ async function randomMagicEffect({ actor, item, workflow }) {
     await applyVisualTimedEffect({
       key: i18n("MAGICAL_BEANS.EFFECTS.RainbowSkin.Name"),
       duration: 60,
+      icon: "icons/magic/light/orb-lightbulb-gray.webp",
       tint: newTint,
       fx: "magic_missile",
       onStart: () =>
@@ -159,6 +179,7 @@ async function randomMagicEffect({ actor, item, workflow }) {
     await applyVisualTimedEffect({
       key: i18n("MAGICAL_BEANS.EFFECTS.ColorfulHair.Name"),
       duration: 60,
+      icon: "icons/magic/light/beam-rays-purple.webp",
       tint: newTint,
       onStart: () =>
         ui.notifications.info(
@@ -174,6 +195,7 @@ async function randomMagicEffect({ actor, item, workflow }) {
     await applyVisualTimedEffect({
       key: i18n("MAGICAL_BEANS.EFFECTS.Levitate.Name"),
       duration: 20,
+      icon: "icons/magic/air/wind-vortex-swirl-purple.webp",
       fx: "energy",
       onStart: async () => {
         await token.document.update({ elevation: 10 });
@@ -193,6 +215,7 @@ async function randomMagicEffect({ actor, item, workflow }) {
     await applyVisualTimedEffect({
       key: i18n("MAGICAL_BEANS.EFFECTS.LongTongue.Name"),
       duration: 120,
+      icon: "icons/magic/unholy/mouth-teeth-long.webp",
       onStart: () =>
         ui.notifications.info(
           i18n("MAGICAL_BEANS.EFFECTS.LongTongue.NotificationStart")
@@ -207,6 +230,7 @@ async function randomMagicEffect({ actor, item, workflow }) {
     await applyVisualTimedEffect({
       key: i18n("MAGICAL_BEANS.EFFECTS.OnlyScreams.Name"),
       duration: 30,
+      icon: "icons/magic/sonic/explosion-shock-sound-wave.webp",
       onStart: () =>
         ui.notifications.info(
           i18n("MAGICAL_BEANS.EFFECTS.OnlyScreams.NotificationStart")
@@ -221,6 +245,7 @@ async function randomMagicEffect({ actor, item, workflow }) {
     await applyVisualTimedEffect({
       key: i18n("MAGICAL_BEANS.EFFECTS.OnlyWhispers.Name"),
       duration: 30,
+      icon: "icons/magic/sonic/scream-wail-shout-teal.webp",
       onStart: () =>
         ui.notifications.info(
           i18n("MAGICAL_BEANS.EFFECTS.OnlyWhispers.NotificationStart")
@@ -235,6 +260,7 @@ async function randomMagicEffect({ actor, item, workflow }) {
     await applyVisualTimedEffect({
       key: i18n("MAGICAL_BEANS.EFFECTS.Vomiting.Name"),
       duration: 10,
+      icon: "icons/magic/water/projectile-stream-vomit.webp",
       fx: "bile",
       onStart: () =>
         ui.notifications.info(
@@ -252,6 +278,7 @@ async function randomMagicEffect({ actor, item, workflow }) {
     await applyVisualTimedEffect({
       key: i18n("MAGICAL_BEANS.EFFECTS.Lightbulb.Name"),
       duration: 60,
+      icon: "icons/magic/light/orb-lightbulb.webp",
       tint: "#FFFFCC",
       fx: "light_pulse",
       onStart: async () => {
@@ -280,27 +307,17 @@ async function randomMagicEffect({ actor, item, workflow }) {
     await applyVisualTimedEffect({
       key: i18n("MAGICAL_BEANS.EFFECTS.Petrified.Name"),
       duration: 60,
+      icon: "icons/magic/earth/strike-body-stone-cracked.webp",
       tint: "#808080",
       onStart: async () => {
         ui.notifications.error(
           i18n("MAGICAL_BEANS.EFFECTS.Petrified.NotificationStart")
         );
 
-        // Aplicar condición de paralizado
+        // Aplicar condición de paralizado (usando el ID correcto)
         const effect = CONFIG.statusEffects.find((e) => e.id === "paralysis");
         if (effect) {
           await actor.toggleStatusEffect("paralysis", { active: true });
-        } else {
-          // Fallback: crear un Active Effect manualmente
-          await actor.createEmbeddedDocuments("ActiveEffect", [
-            {
-              name: i18n("MAGICAL_BEANS.EFFECTS.Petrified.Name"),
-              origin: actor.uuid,
-              disabled: false,
-              duration: { seconds: 60 },
-              flags: { "magical-beans": { petrified: true } },
-            },
-          ]);
         }
       },
       onEnd: async () => {
@@ -310,14 +327,6 @@ async function randomMagicEffect({ actor, item, workflow }) {
 
         // Remover condición
         await actor.toggleStatusEffect("paralysis", { active: false });
-
-        // Remover Active Effect manual si existe
-        const customEffect = actor.effects.find(
-          (e) => e.flags["magical-beans"]?.petrified
-        );
-        if (customEffect) {
-          await customEffect.delete();
-        }
       },
     });
   } else if (total <= 99) {
