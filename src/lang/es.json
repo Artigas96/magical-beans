@@ -2,9 +2,95 @@
   "MAGICAL_BEANS": {
     "BERRY": {
       "Name": "Baya Mágica",
-      "Description": "Una baya con magia salvaje impredecible."
+      "Description": "Una baya llena de magia salvaje impredecible."
+    },
+    "GRENADE": {
+      "Name": "Granada Mágica Salvaje",
+      "Description": "Una granada que libera un efecto mágico aleatorio."
+    },
+    "ARROW": {
+      "Name": "Flecha Mágica Caótica",
+      "Description": "Una flecha que desata un efecto mágico caótico al impactar."
+    },
+    "MESSAGES": {
+      "NoTokenFound": "No se encontró un token válido para el actor.",
+      "EffectAlreadyActive": "Este efecto ya está activo.",
+      "MagicResult": "Resultado mágico: {total}",
+      "EffectDuration": "<b>{effect}</b> durará {duration} segundos.",
+      "EffectEnded": "El efecto <b>{effect}</b> ha terminado.",
+      "AlreadyMaxHP": "El personaje ya tiene la vida máxima.",
+      "AlreadyHasInspiration": "El personaje ya tiene la vida máxima y ya tiene Inspiración."
+    },
+    "EFFECTS": {
+      "FatalDrain": {
+        "Name": "Drenaje Fatal",
+        "Flavor": "¡Resultado Mágico FATAL!",
+        "Description": "Un drenaje repentino de energía deja al personaje con **1 Punto de Vida** restante.",
+        "NotificationError": "¡Quedas a 1 HP!",
+        "NotificationInfo": "Ya estabas a 1 HP o menos.",
+        "NoEffect": "El drenaje de energía es leve, la vida del personaje se mantiene en {hp}."
+      },
+      "RainbowSkin": {
+        "Name": "Piel Arcoíris",
+        "NotificationStart": "¡Tu piel se vuelve de un color brillante!",
+        "NotificationEnd": "Tu piel vuelve a la normalidad."
+      },
+      "ColorfulHair": {
+        "Name": "Pelo de Color",
+        "NotificationStart": "Tu pelo cambia a un color inesperado.",
+        "NotificationEnd": "Tu pelo vuelve a la normalidad."
+      },
+      "Levitate": {
+        "Name": "Levitar",
+        "NotificationStart": "¡Comienzas a levitar 10 pies!",
+        "NotificationEnd": "Vuelves a tocar tierra."
+      },
+      "LongTongue": {
+        "Name": "Lengua Larga",
+        "NotificationStart": "Tu lengua crece de forma grotesca",
+        "NotificationEnd": "Tu lengua vuelve a su tamaño normal"
+      },
+      "OnlyScreams": {
+        "Name": "Solo Gritos",
+        "NotificationStart": "¡Solo puedes comunicarte gritando!",
+        "NotificationEnd": "Vuelves a hablar normalmente."
+      },
+      "OnlyWhispers": {
+        "Name": "Solo Susurros",
+        "NotificationStart": "¡Solo puedes comunicarte susurrando!",
+        "NotificationEnd": "Vuelves a hablar normalmente."
+      },
+      "Vomiting": {
+        "Name": "Vómitos",
+        "NotificationStart": "¡Empiezas a vomitar descontroladamente!",
+        "NotificationEnd": "Los vómitos han cesado."
+      },
+      "Lightbulb": {
+        "Name": "Bombilla",
+        "NotificationStart": "¡Te conviertes en una potente bombilla de luz!",
+        "NotificationEnd": "Tu luz se apaga y vuelves a la normalidad."
+      },
+      "Petrified": {
+        "Name": "Petrificado",
+        "NotificationStart": "¡El personaje se petrifica! No puede moverse ni actuar.",
+        "NotificationEnd": "La petrificación termina. Vuelves a la normalidad."
+      },
+      "Healing": {
+        "Name": "Curación",
+        "Flavor": "¡Resultado Mágico de Curación! El personaje se cura {total} HP.",
+        "Notification": "El personaje se ha curado {amount} HP."
+      },
+      "MaxHealing": {
+        "Name": "Curación Máxima",
+        "Flavor": "¡Resultado Mágico CRÍTICO! El personaje se cura COMPLETAMENTE. (+{amount} HP)",
+        "Description": "El personaje es sanado por completo por un destello de luz mágica. ¡Vida máxima restaurada!",
+        "Notification": "¡Curación máxima! El personaje ha recuperado {amount} HP.",
+        "InspirationFlavor": "Resultado Mágico CRÍTICO, ¡Inspiración ganada!",
+        "InspirationDescription": "Un aura de magia rodea al personaje, cuya vitalidad ya es máxima. La energía mágica se canaliza en **Inspiración**.",
+        "InspirationNotification": "¡Inspiración otorgada! El personaje ya estaba a máxima vida.",
+        "NoEffectFlavor": "Resultado Mágico CRÍTICO, pero sin efecto adicional.",
+        "NoEffectDescription": "Un aura de magia rodea al personaje, pero su vitalidad ya es máxima y ya ha sido Inspirado."
+      }
     }
-  },
-  "magical-items.magical-berry.name": "Baya Mágica",
-  "magical-items.magical-berry.description": "Una baya llena de magia salvaje impredecible."
+  }
 }
