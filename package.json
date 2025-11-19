@@ -1,6 +1,6 @@
 {
   "name": "magical-beans",
-  "version": "1.0.40",
+  "version": "1.0.41",
   "scripts": {
     "build": "gulp build",
     "build:watch": "gulp watch",
