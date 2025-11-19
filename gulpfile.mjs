@@ -24,7 +24,7 @@ const distDirectory = "./dist";
 const stylesDirectory = `${sourceDirectory}/styles`;
 const stylesExtension = "scss";
 const sourceFileExtension = "js";
-const staticFiles = ["lang", "module.json"];
+const staticFiles = ["lang"];
 
 /** ******************/
 /*      BUILD       */
@@ -93,6 +93,21 @@ async function copyFiles() {
 	}
 }
 
+/**
+ * Process module.json to replace version placeholders
+ */
+async function processModuleJson() {
+	console.log("  Procesando module.json...");
+	try {
+		// Dynamically import the update script
+		await import('./scripts/update-module-version.js');
+	} catch (error) {
+		console.error("  ❌ Error procesando module.json:", error.message);
+		throw error;
+	}
+}
+
+
 
 /**
  * Build Compendium Database (.db) from source JSON files
@@ -153,7 +168,7 @@ export function watch() {
 	gulp.watch(`${sourceDirectory}/items/**/*.json`, { ignoreInitial: false }, buildPacks);
 }
 
-export const build = gulp.series(clean, gulp.parallel(buildCode, copyScripts, buildStyles, copyFiles, buildPacks));
+export const build = gulp.series(clean, gulp.parallel(buildCode, copyScripts, buildStyles, copyFiles, buildPacks, processModuleJson));
 
 /** ******************/
 /*      CLEAN       */
