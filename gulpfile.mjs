@@ -100,7 +100,7 @@ async function processModuleJson() {
 	console.log("  Procesando module.json...");
 	try {
 		// Dynamically import the update script
-		await import('./scripts/update-module-version.js');
+		await import('./scripts/update-module-version.mjs');
 	} catch (error) {
 		console.error("  ❌ Error procesando module.json:", error.message);
 		throw error;

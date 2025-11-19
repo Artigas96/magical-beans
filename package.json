@@ -8,7 +8,7 @@
     "clean": "gulp clean",
     "clean:link": "gulp link --clean",
     "changelog": "standard-version --release-as ${RELEASE_VERSION}",
-    "apply-version": "node ./scripts/update-module-version.js",
+    "apply-version": "node ./scripts/update-module-version.mjs",
     "tag-release": "np --no-tests --no-publish --no-release-draft"
   },
   "devDependencies": {
