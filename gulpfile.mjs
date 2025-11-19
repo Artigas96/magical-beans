@@ -24,7 +24,7 @@ const distDirectory = "./dist";
 const stylesDirectory = `${sourceDirectory}/styles`;
 const stylesExtension = "scss";
 const sourceFileExtension = "js";
-const staticFiles = ["items", "scripts", "lang", "packs", "module.json"];
+const staticFiles = ["lang", "module.json"];
 
 /** ******************/
 /*      BUILD       */
@@ -42,7 +42,29 @@ function buildCode() {
 		})
 		.pipe(source(`randomEffect.js`))
 		.pipe(buffer())
-		.pipe(gulp.dest(`${distDirectory}/scripts`));  // Removidos sourcemaps para evitar conflictos
+		.pipe(gulp.dest(`${distDirectory}/scripts`));
+}
+
+/**
+ * Copy additional script files that don't need bundling
+ */
+async function copyScripts() {
+	const scriptFiles = [
+		"magicRandomHook.js",
+		"localizeItems.js"
+	];
+
+	await fs.ensureDir(`${distDirectory}/scripts`);
+
+	for (const file of scriptFiles) {
+		const sourcePath = `${sourceDirectory}/scripts/${file}`;
+		const destPath = `${distDirectory}/scripts/${file}`;
+
+		if (fs.existsSync(sourcePath)) {
+			await fs.copy(sourcePath, destPath);
+			console.log(`  Copiado: ${file}`);
+		}
+	}
 }
 
 /**
@@ -66,6 +88,7 @@ async function copyFiles() {
 	for (const file of staticFiles) {
 		if (fs.existsSync(`${sourceDirectory}/${file}`)) {
 			await fs.copy(`${sourceDirectory}/${file}`, `${distDirectory}/${file}`);
+			console.log(`  Copiado: ${file}`);
 		}
 	}
 }
@@ -76,54 +99,43 @@ async function copyFiles() {
  */
 async function buildPacks(cb) {
 	console.log("¡Tarea buildPacks iniciada!");
-	const packName = "magical-items"; // Debe coincidir con el 'name' en module.json
+	const packName = "magical-items";
 	const sourcePath = path.join(sourceDirectory, "items");
 	const targetPath = path.join(distDirectory, "packs", `${packName}.db`);
 
-	// 1. Asegurar la carpeta de destino
 	await fs.ensureDir(path.dirname(targetPath));
 
 	try {
-		// 2. Leer todos los archivos JSON de la carpeta fuente
 		const filenames = (await fs.readdir(sourcePath)).filter(name => name.endsWith('.json'));
 		let dbContent = '';
 
 		console.log(`🔎 Procesando ${filenames.length} documentos para el compendio '${packName}'...`);
 
-		// 3. Procesar cada archivo, añadir ID y formatear
 		for (const filename of filenames) {
 			const filePath = path.join(sourcePath, filename);
 			const fileContent = await fs.readFile(filePath, 'utf8');
 
 			try {
 				const itemData = JSON.parse(fileContent);
-
-				// Asignar el ID único de Foundry VTT
 				itemData._id = nanoid(16);
-
-				// Convertir a JSON de una sola línea y añadir al contenido de la DB
 				dbContent += JSON.stringify(itemData) + '\n';
-				console.log(`\t✅ Procesado: ${filename}`); // Muestra el éxito
+				console.log(`\t✅ Procesado: ${filename}`);
 
 			} catch (e) {
-				// ¡Si esto se imprime, tienes un JSON mal formateado!
 				console.error(`\t❌ ERROR DE PARSEO en ${filename}: ${e.message}`);
 			}
 		}
 
 		console.log(`Tamaño del contenido a escribir: ${dbContent.length} bytes.`);
-		// 4. Escribir el contenido final en el archivo .db
 		await fs.writeFile(targetPath, dbContent);
 
 		console.log(`\n🎉 Compendio '${packName}' generado en ${targetPath}`);
 
 	} catch (error) {
 		console.error(`\n❌ ERROR al construir el compendio '${packName}':`, error.message);
-		// Llama al callback con el error para fallar la tarea de Gulp
 		return cb(error);
 	}
 
-	// Llama al callback si todo ha ido bien
 	cb();
 }
 
@@ -131,18 +143,17 @@ async function buildPacks(cb) {
  * Watch for changes for each build step
  */
 export function watch() {
-	gulp.watch(`${sourceDirectory}/**/*.${sourceFileExtension}`, { ignoreInitial: false }, buildCode);
+	gulp.watch(`${sourceDirectory}/**/*.${sourceFileExtension}`, { ignoreInitial: false }, gulp.series(buildCode, copyScripts));
 	gulp.watch(`${stylesDirectory}/**/*.${stylesExtension}`, { ignoreInitial: false }, buildStyles);
 	gulp.watch(
 		staticFiles.map((file) => `${sourceDirectory}/${file}`),
 		{ ignoreInitial: false },
 		copyFiles,
 	);
-	// Watch para los archivos JSON del compendio
-	gulp.watch(`${sourceDirectory}/items/**/*.json`, { ignoreInitial: false }, buildPacks); // <-- Añadido el watcher para ítems
+	gulp.watch(`${sourceDirectory}/items/**/*.json`, { ignoreInitial: false }, buildPacks);
 }
 
-export const build = gulp.series(clean, gulp.parallel(buildCode, buildStyles, copyFiles, buildPacks));
+export const build = gulp.series(clean, gulp.parallel(buildCode, copyScripts, buildStyles, copyFiles, buildPacks));
 
 /** ******************/
 /*      CLEAN       */
@@ -152,7 +163,7 @@ export const build = gulp.series(clean, gulp.parallel(buildCode, buildStyles, co
  * Remove built files from `dist` folder while ignoring source files
  */
 export async function clean() {
-	const files = [...staticFiles, "module"];
+	const files = ["lang", "module.json", "scripts", "packs"];
 
 	if (fs.existsSync(`${stylesDirectory}/${packageId}.${stylesExtension}`)) {
 		files.push("styles");
