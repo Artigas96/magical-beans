@@ -3,9 +3,9 @@ import { nodeResolve } from "@rollup/plugin-node-resolve";
 export default () => ({
 	input: "src/scripts/randomEffect.js",
 	output: {
-		dir: "dist/scripts",
+		file: "dist/scripts/randomEffect.js",  // Cambiado de 'dir' a 'file' con ruta específica
 		format: "es",
-		sourcemap: false,
+		sourcemap: false,  // Activado para debugging
 	},
 	plugins: [nodeResolve()],
 });
