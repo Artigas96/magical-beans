@@ -83,11 +83,11 @@ jobs:
               uses: ncipollo/release-action@v1
               with:
                   allowUpdates: true
-                  name: ${{ github.event.release.name }}
+                  name: Release ${{ github.ref_name }}
                   token: ${{ secrets.GITHUB_TOKEN }}
                   artifacts: "./dist/${{ env.package_type }}.json, ./${{ env.package_type }}.zip"
-                  tag: ${{ github.event.release.tag_name }}
-                  body: ${{ github.event.release.body }}
+                  tag: ${{ github.ref_name }}
+                  body: "See CHANGELOG.md for details"
 
             - name: Get Module ID
               id: moduleID
