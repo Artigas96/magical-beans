@@ -79,7 +79,7 @@ async function randomMagicEffect({ actor, item, workflow }) {
     );
 
     // Guardar el tinte original
-    const originalTint = token.document.texture?.tint || null;
+    const originalTint = token.document?.texture?.tint || null;
 
     // Aplicar tintado si se especifica
     if (tint) {
